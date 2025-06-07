@@ -3,13 +3,13 @@ import axios from 'axios'
 const baseUrl = '/api/v1/auth'
 
 interface LoginCredentials {
-    email: string
-    pin: string
+  email: string
+  pin: string
 }
 
 const login = async (credentials: LoginCredentials) => {
-    const response = await axios.post(`${baseUrl}/login`, credentials)
-    return response.data
+  const response = await axios.post(`${baseUrl}/login`, credentials)
+  return response.data
 }
 
 // async function login2(username, password) {

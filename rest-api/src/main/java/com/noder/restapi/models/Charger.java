@@ -41,10 +41,6 @@ public class Charger {
     private List<Connector> connectors;
 
     @ManyToOne
-    @JoinColumn(name = "administrator_id", nullable = false)
-    private UserEntity administrator;
-
-    @ManyToOne
     @JoinColumn(name = "charging_station_id", nullable = false)
     private ChargingStation chargingStation;
 
@@ -127,14 +123,6 @@ public class Charger {
 
     public void setWebSocketServer(WebSocketServer webSocketServer) {
         this.webSocketServer = webSocketServer;
-    }
-
-    public UserEntity getAdministrator() {
-        return administrator;
-    }
-
-    public void setAdministrator(UserEntity administrator) {
-        this.administrator = administrator;
     }
 
     public Instant getCreated_at() {

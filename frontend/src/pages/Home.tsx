@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-function Home() {
+const Home = () => {
   return (
     <div>
       <h1>Bienvenido a la App de Cargadores</h1>

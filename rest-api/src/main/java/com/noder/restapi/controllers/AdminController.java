@@ -49,7 +49,6 @@ public class AdminController {
         // TODO: Set id
         UserEntity user = userService.getUserFromAuthentication().orElse(null);
         if (user == null) return ResponseEntity.badRequest().build();
-        charger.setAdministrator(user);
         return ResponseEntity.ok(chargerService.saveCharger(charger).get());
     }
 

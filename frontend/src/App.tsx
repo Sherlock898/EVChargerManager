@@ -4,13 +4,14 @@
 import { Route, Routes } from 'react-router';
 import LoginPage from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Stations from './pages/Stations';
 
 // type UserType = {
 //   token: string;
 //   tokenType: string;
 // }
 
-function App() {
+const App = () => {
   // const [email, setEmail] = useState<string>('');
   // const [pin, setPin] = useState<string>('');
   // const [user, setUser] = useState<UserType | null>(null)
@@ -41,6 +42,7 @@ function App() {
     <Routes >
       <Route path="/login" element={<LoginPage />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/stations" element={<Stations />} />
     </Routes>
   )
 }

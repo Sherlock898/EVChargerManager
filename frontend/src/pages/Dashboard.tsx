@@ -1,6 +1,6 @@
 import Sidebar from "../components/Sidebar";
 
-function Dashboard() {
+const Dashboard = () => {
   return (
     <Sidebar />
   )

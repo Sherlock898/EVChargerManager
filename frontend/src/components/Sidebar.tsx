@@ -81,14 +81,14 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Botón de hamburguesa móvil - solo visible en móvil */}
+      {/* The thing to close it, only vissible on mobile*/}
       <div className="md:hidden fixed top-0 left-0 w-full bg-[#2c3e50] p-2 flex justify-between items-center z-1000">
         <div className="text-white font-medium">EVMS</div>
         <button
           onClick={toggleMobileMenu}
           className="p-2 text-white cursor-pointer"
         >
-          {/* Icono de hamburguesa simple con CSS */}
+          {/* Three bars, this might be changed for an icon or something */}
           <div className="w-6 h-5 flex flex-col justify-between">
             <span className="w-full h-0.5 bg-white rounded-sm"></span>
             <span className="w-full h-0.5 bg-white rounded-sm"></span>

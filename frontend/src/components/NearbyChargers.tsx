@@ -6,7 +6,7 @@ type ChargerType = {
     name: string
 }
 
-function NearbyChargers() {
+const NearbyChargers = () => {
     const [chargers, setChargers] = useState<ChargerType[]>([]);
 
     useEffect(() => {
