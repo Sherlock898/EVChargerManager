@@ -30,6 +30,11 @@ type UserData = {
   photoUrl?: string;
 };
 
+type SidebarProps = {
+  isExpanded?: boolean;
+  onToggle?: (expanded: boolean) => void;
+};
+
 const UserPanel = ({ user, className }: UserPanelProps) => {
   const [userData, setUserData] = useState<UserData | null>(null);
 
@@ -71,18 +76,27 @@ const UserPanel = ({ user, className }: UserPanelProps) => {
   )
 }
 
-const Sidebar = () => {
+const Sidebar = ({ isExpanded = true, onToggle }: SidebarProps) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const [internalExpanded, setInternalExpanded] = useState(isExpanded);
+  
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const toggleSidebar = () => {
+    const newExpanded = !internalExpanded;
+    setInternalExpanded(newExpanded);
+    if (onToggle) onToggle(newExpanded);
+  };
+
+  const sidebarWidth = isExpanded ? 'w-full md:w-64' : 'w-full md:w-20';
+
   return (
     <>
       {/* The thing to close it, only vissible on mobile*/}
-      <div className="md:hidden fixed top-0 left-0 w-full bg-[#2c3e50] p-2 flex justify-between items-center z-1000">
+      <div className="md:hidden fixed top-0 left-0 w-full bg-[#2c3e50] p-2 flex justify-between items-center z-50">
         <div className="text-white font-medium">EVMS</div>
         <button
           onClick={toggleMobileMenu}
@@ -101,20 +115,26 @@ const Sidebar = () => {
       <aside
         className={`
           bg-[#2c3e50] text-white border-r border-[#1a2533]
-          
-          /* Mobile: open and close with button */
           fixed top-0 left-0 z-20 flex flex-col
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
-          w-full h-full pt-16
-          
-          /* Desktop: Always vissible */
-          md:translate-x-0 md:w-64 md:pt-6 
-          
-          transition-transform duration-300 ease-in-out
+          h-full pt-16
+          transition-transform duration-300 ease-in-out overflow-hidden
+          ${sidebarWidth}
+          ${isMobileMenuOpen ? 'translate-x-0' : 'md:translate-x-0 -translate-x-full'}
         `}
       >
+        {/* Botón plegar/desplegar escritorio */}
+        <div className="hidden md:flex justify-end p-2 border-b border-[#3d5166]">
+          <button
+            onClick={toggleSidebar}
+            className="text-white text-xl px-2 hover:bg-[#1a2533] rounded"
+            aria-label={internalExpanded ? 'Plegar sidebar' : 'Desplegar sidebar'}
+          >
+            {internalExpanded ? '«' : '»'}
+          </button>
+        </div>
+        
         {/* User panel */}
-        <UserPanel className='border-b border-[#3d5166]' />
+        {internalExpanded && <UserPanel className='border-b border-[#3d5166]' />}
 
         {/* Items */}
         <nav className="mt-5 flex-1">
@@ -134,7 +154,8 @@ const Sidebar = () => {
                         'border-white bg-[#3498db]' : 'border-gray-300 bg-transparent'
                       }`}></div>
                   </div>
-                  <span className="text-base md:text-sm">{item.name}</span>
+                  {/* Si está plegado, ocultar texto */}
+                  {internalExpanded && <span className="text-base md:text-sm">{item.name}</span>}
                 </Link>
               </li>
             ))}
@@ -147,7 +168,7 @@ const Sidebar = () => {
             <div className="w-5 h-5 flex items-center justify-center">
               <div className="w-4 h-4 rounded-full border border-gray-300"></div>
             </div>
-            <span>Cerrar sesión</span>
+            {internalExpanded && <span>Cerrar sesión</span>}
           </button>
         </div>
       </aside>

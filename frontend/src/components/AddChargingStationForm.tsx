@@ -1,21 +1,15 @@
 import { useState } from 'react';
-
-type ChargingStationData = {
-  name: string;
-  location?: string;
-  photoUrl?: string;
-  info?: string;
-};
+import type { ChargingStationCreate } from '../interfaces/ChargingStation';
+import stationService from '../services/chargingStationService';
 
 type Props = {
   onChargingStationAdded: () => void;
-  token: string;
   setErrorMessage: (msg: string | null) => void;
   setTypeErrorMessage: (type: 'success' | 'error' | null) => void;
 };
 
-const AddChargingStationForm = ({ onChargingStationAdded, token, setErrorMessage, setTypeErrorMessage}: Props) => {
-  const [form, setForm] = useState<ChargingStationData>({ name: ''});
+const AddChargingStationForm = ({ onChargingStationAdded, setErrorMessage, setTypeErrorMessage}: Props) => {
+  const [form, setForm] = useState<ChargingStationCreate>({ name: ''});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -32,17 +26,7 @@ const AddChargingStationForm = ({ onChargingStationAdded, token, setErrorMessage
     }
 
     try {
-      const response = await fetch('/api/v1/charging-stations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'aplication*json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      });
-
-      if (!response.ok) throw new Error();
-
+      const newStation = await stationService.registerStation(form);
       setForm({ name: ''});
       setErrorMessage('Estación agregada correctamente');
       setTypeErrorMessage('success');
@@ -62,13 +46,71 @@ const AddChargingStationForm = ({ onChargingStationAdded, token, setErrorMessage
   };
 
   return (
-    <form onSubmit={handleSubmit} className="add-station-form">
-      <h2>Añadir Estación</h2>
-      <input type="text" name="name" placeholder="Nombre *" value={form.name} onChange={handleChange} required />
-      <input type="text" name="location" placeholder="Ubicación" value={form.location || ''} onChange={handleChange} />
-      <input type="text" name="photoUrl" placeholder="URL de la foto" value={form.photoUrl || ''} onChange={handleChange} />
-      <textarea name="info" placeholder="Información adicional" value={form.info || ''} onChange={handleChange} />
-      <button type="submit">Guardar estación</button>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <h2 className="text-lg font-semibold text-gray-800">Añadir Estación</h2>
+      <div>
+        <label htmlFor="name" className="block text-sm text-gray-700 mb-1 font-medium">
+          Nombre *
+        </label>
+        <input
+          type="text"
+          name="name"
+          id="name"
+          value={form.name}
+          onChange={handleChange}
+          required
+          className="w-full px-3 py-2 rounded-md border border-stone-300 bg-zinc-50 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-700"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="location" className="block text-sm text-gray-700 mb-1 font-medium">
+          Ubicación
+        </label>
+        <input
+          type="text"
+          name="location"
+          id="location"
+          value={form.location || ''}
+          onChange={handleChange}
+          className="w-full px-3 py-2 rounded-md border border-stone-300 bg-zinc-50 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-700"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="photoURL" className="block text-sm text-gray-700 mb-1 font-medium">
+          URL de la foto
+        </label>
+        <input
+          type="text"
+          name="photoURL"
+          id="photoURL"
+          value={form.photoURL || ''}
+          onChange={handleChange}
+          className="w-full px-3 py-2 rounded-md border border-stone-300 bg-zinc-50 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-700"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="info" className="block text-sm text-gray-700 mb-1 font-medium">
+          Información adicional
+        </label>
+        <textarea
+          name="info"
+          id="info"
+          rows={3}
+          value={form.info || ''}
+          onChange={handleChange}
+          className="w-full px-3 py-2 rounded-md border border-stone-300 bg-zinc-50 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-700"
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="w-full py-2 bg-cyan-700 text-white text-sm font-semibold rounded-md hover:bg-cyan-800 transition cursor-pointer"
+      >
+        Guardar estación
+      </button>
     </form>
   );
 };

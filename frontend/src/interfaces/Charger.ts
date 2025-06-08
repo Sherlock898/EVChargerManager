@@ -4,7 +4,7 @@ import type { WebSocketServerInfo } from "./WebSocketServerInfo"
 export interface Charger {
   id: number,
   location: string,
-  conector_count: number,
+  connector_count: number,
   uri: string,
   key: string,
   chargerStatus: string

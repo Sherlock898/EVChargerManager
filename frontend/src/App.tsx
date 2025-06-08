@@ -2,8 +2,10 @@
 // import LoginForm from './components/LoginForm';
 // import authService from './services/authService';
 import { Route, Routes } from 'react-router';
-import LoginPage from './pages/Login';
+import Layout from "./components/Layout";
 import Dashboard from './pages/Dashboard';
+import LoginPage from './pages/Login';
+import StationDetails from './pages/StationDetails';
 import Stations from './pages/Stations';
 
 // type UserType = {
@@ -41,10 +43,25 @@ const App = () => {
   return (
     <Routes >
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/stations" element={<Stations />} />
+      <Route
+        path="/dashboard"
+        element={
+          <Layout>
+            <Dashboard />
+          </Layout>
+        }
+      />
+      <Route
+        path="/stations"
+        element={
+          <Layout>
+            <Stations />
+          </Layout>
+        }
+      />
+      <Route path="/stations/:stationId" element={<StationDetails />} />
     </Routes>
-  )
-}
+  );
+};
 
 export default App
