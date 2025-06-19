@@ -13,6 +13,12 @@ export interface Charger {
   webSocketServer: WebSocketServerInfo
 };
 
+export interface ChargerCreate {
+  name: string;
+  location?: string;
+  connector_count?: number;
+}
+
 export interface Connector {
   id: number,
   connector_id: number,

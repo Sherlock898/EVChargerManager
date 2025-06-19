@@ -1,2 +1,6 @@
 @import "tailwindcss";
-
+@layer utilities {
+  .max-pt-20 {
+    max-padding-top: 5rem; /* No existe max-padding-top */
+  }
+}

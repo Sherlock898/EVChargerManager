@@ -52,14 +52,21 @@ const App = () => {
         }
       />
       <Route
-        path="/stations"
+        path="/estaciones"
         element={
           <Layout>
             <Stations />
           </Layout>
         }
       />
-      <Route path="/stations/:stationId" element={<StationDetails />} />
+      <Route
+        path="/stations/:stationId"
+        element={
+          <Layout>
+            <StationDetails />
+          </Layout>
+        }
+      />
     </Routes>
   );
 };

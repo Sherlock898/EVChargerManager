@@ -45,7 +45,7 @@ const Stations = () => {
   }
   
   return (
-    <div className="flex-1 p-10 min-h-screen bg-gray-50">
+    <div className="flex-1">
        {showForm && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-md p-6 shadow-lg max-w-lg w-full relative z-50">
