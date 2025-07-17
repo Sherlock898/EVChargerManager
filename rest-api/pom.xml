@@ -106,7 +106,7 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Docs -->
+		<!-- Swagger UI -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>

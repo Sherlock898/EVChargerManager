@@ -4,14 +4,14 @@ export interface ChargingStation {
   id: string;
   name: string;
   location: string;
-  photoURL: string;
+  photoUrl: string;
   info: string;
   chargers: Charger[]
 }
 
 export interface ChargingStationCreate {
   name: string,
-  location?: string,
-  photoURL?: string,
-  info?: string
+  location: string,
+  photoUrl: string,
+  info: string
 }

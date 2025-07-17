@@ -68,11 +68,11 @@ public class DataLoader {
     
         createRoleIfNotFound("ROLE_USER", userPrivileges);
         // createRoleIfNotFound("ROLE_SUB_ADMIN", subAdminPrivileges);
-        createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
-
+        Role roleAdmin = createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
         Role roleSysAdmin = createRoleIfNotFound("ROLE_SYS_ADMIN", systemAdminPrivileges);
-    
-        createSysAdminIfNotFound(List.of(roleSysAdmin));
+
+        createTestAdminIfNotFound(List.of(roleAdmin));
+        createSysAdminIfNotFound(List.of(roleSysAdmin));    
     }
 
     @Transactional
@@ -96,6 +96,23 @@ public class DataLoader {
             roleRepostiory.save(role);
         }
         return role;
+    }
+
+    @Transactional
+    UserEntity createTestAdminIfNotFound(List<Role> roles){
+        UserEntity adminUser = userRepository.findByEmail("user@user").orElse(null);
+        if(adminUser == null){
+            adminUser = new UserEntity();
+            adminUser.setFirstName("Admin");
+            adminUser.setLastName("Cargadores");
+            adminUser.setEmail("user@user");
+            adminUser.setPin(encoder.encode("1111"));
+            adminUser.setPhone("11111111");
+            adminUser.setRoles(roles);
+            System.out.println("Created Admin");
+            userRepository.save(adminUser);
+        }
+        return adminUser;
     }
 
     @Transactional

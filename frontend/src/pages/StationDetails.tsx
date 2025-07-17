@@ -66,7 +66,7 @@ const StationDetails = () => {
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1">
             <div className="bg-white rounded-full overflow-hidden w-48 h-48 flex items-center justify-center mb-6">
-              <img src={station.photoURL} alt={station.name} className="w-full h-full object-cover" />
+              <img src={station.photoUrl} alt={station.name} className="w-full h-full object-cover" />
             </div>
             <p className="mb-2 text-gray-700">{station.info}</p>
             <p className="text-gray-700">{station.location}</p>

@@ -3,7 +3,6 @@ package com.noder.restapi.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -36,17 +35,22 @@ public class SecurityConfig {
             .sessionManagement(sessionManagement ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/chargers/control/**").hasAnyRole("ADMIN", "SUB_ADMIN")
-                .requestMatchers("/api/chargers/history/**").hasAnyRole("ADMIN", "SUB_ADMIN")
-                .requestMatchers("/api/chargers/nearby").hasRole("USER")
+                // Swagger ui Endpoints
                 .requestMatchers("/swagger-ui/**").permitAll()
-                .requestMatchers("/api/v1/auth/test_auth").authenticated()
+                .requestMatchers("/swagger-ui.html").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/v3/api-docs/swagger-config").permitAll()
+                .requestMatchers("/swagger-resources/**").permitAll()
+                .requestMatchers("/webjars/**").permitAll()
+              
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/chargers/control/**").hasAnyRole("ADMIN", "SUB_ADMIN")
+                .requestMatchers("/api/v1/chargers/history/**").hasAnyRole("ADMIN", "SUB_ADMIN")
+                .requestMatchers("/api/v1/chargers/nearby").hasRole("USER")
+                .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/error").permitAll()  
-                .anyRequest().authenticated()
-            )
-            .httpBasic(Customizer.withDefaults())
+                .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -56,8 +60,9 @@ public class SecurityConfig {
     AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+    
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 

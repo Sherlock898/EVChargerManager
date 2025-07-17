@@ -15,7 +15,7 @@ const station1: ChargingStation = {
   id: "cs-001",
   name: "Estación Central",
   location: "Av. Libertador 1000",
-  photoURL: "https://media.istockphoto.com/id/1453953453/photo/strategy-of-diversified-investment.jpg?s=612x612&w=0&k=20&c=GdKGA5EuK0QfKm76ExjkK64iPZLuTUOyIDQlXs-ZRQM=",
+  photoUrl: "https://media.istockphoto.com/id/1453953453/photo/strategy-of-diversified-investment.jpg?s=612x612&w=0&k=20&c=GdKGA5EuK0QfKm76ExjkK64iPZLuTUOyIDQlXs-ZRQM=",
   info: "Carga rápida disponible 24/7.",
   chargers: [] // se llena luego
 }
@@ -24,7 +24,7 @@ const station2: ChargingStation = {
   id: "cs-002",
   name: "Carga Mall Norte",
   location: "Mall Norte, P4",
-  photoURL: "https://www.karrass.com/_next/static/media/Negotiating_around_table.a34c0d98.jpg",
+  photoUrl: "https://www.karrass.com/_next/static/media/Negotiating_around_table.a34c0d98.jpg",
   info: "Ubicada en estacionamiento subterráneo.",
   chargers: [] // se llena luego
 }
@@ -92,9 +92,8 @@ export const mockStations: ChargingStation[] = [station1, station2, station1, st
 
 
 const getUserStations = async () => {
-  return mockStations;
   try {
-    const response = await api.get('/api/v1/charging-stations')
+    const response = await api.get('/admin/stations');
     return response.data;
   } catch (error) {
     console.log("Error fetching stations", error)
@@ -104,7 +103,9 @@ const getUserStations = async () => {
 
 const registerStation = async (station: ChargingStationCreate) => {
   try {
-    const response = await api.post('api/v1/charging-stations', station);
+    console.log(station);
+    const lol = {name: 'Xd', location: 'lol', photoUrl: 'xd.com', info: 'ay'};
+    const response = await api.post('/admin/stations', lol);
     return response.data;
   } catch (error) {
     console.log("Error registering station", error);

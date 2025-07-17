@@ -1,74 +1,101 @@
-// import { useState } from 'react';
 // import LoginForm from './components/LoginForm';
 // import authService from './services/authService';
-import { Route, Routes } from 'react-router';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import Layout from "./components/Layout";
 import Dashboard from './pages/Dashboard';
 import LoginPage from './pages/Login';
 import StationDetails from './pages/StationDetails';
 import Stations from './pages/Stations';
+import Settings from './pages/Settings';
+import React, { useEffect, useState } from 'react';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
-// type UserType = {
-//   token: string;
-//   tokenType: string;
-// }
+type UserType = {
+  token: string;
+  tokenType: string;
+};
 
-const App = () => {
-  // const [email, setEmail] = useState<string>('');
-  // const [pin, setPin] = useState<string>('');
-  // const [user, setUser] = useState<UserType | null>(null)
-  // const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  // const [typeErrorMessage, setTypeErrorMessage] = useState<string | null>(null)
+const AppContent: React.FC = () => {
+  const [user, setUser] = useState<UserType | null>(
+    JSON.parse(localStorage.getItem('user') || 'null')
+  );
+  const [theme, setTheme] = useState<'light' | 'dark'>(
+    localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'
+  );
 
-  // const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault()
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
-  //   try {
-  //     const loggedUser = await authService.login({email, pin})
-  //     setUser(loggedUser)
-  //     setEmail('')
-  //     setPin('')
-  //   } catch (exception) {
-  //     setErrorMessage('Wrong credentials')
-  //     setTypeErrorMessage('error')
-  //     setTimeout(() => {
-  //       setErrorMessage(null)
-  //       setTypeErrorMessage(null)
-  //     }, 5000)
-  //   }
-  // }
-
-  // console.log(user)
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+  };
 
   return (
     <Routes >
       <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/dashboard"
-        element={
-          <Layout>
-            <Dashboard />
-          </Layout>
-        }
-      />
-      <Route
-        path="/estaciones"
-        element={
-          <Layout>
-            <Stations />
-          </Layout>
-        }
-      />
-      <Route
-        path="/stations/:stationId"
-        element={
-          <Layout>
-            <StationDetails />
-          </Layout>
-        }
-      />
+
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+      <Route element={<ProtectedRoute />}>
+        <Route
+          path="/dashboard"
+          element={
+            <Layout>
+              <Dashboard />
+            </Layout>
+          }
+        />
+
+        <Route
+          path="/estaciones"
+          element={
+            <Layout>
+              <Stations />
+            </Layout>
+          }
+        />
+        <Route
+          path="/stations/:stationId"
+          element={
+            <Layout>
+              <StationDetails />
+            </Layout>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            user ? (
+              <Layout>
+                <Settings
+                  user={user}
+                  onLogout={handleLogout}
+                  theme={theme}
+                  onThemeChange={setTheme}
+                />
+              </Layout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+      </Route>
     </Routes>
   );
 };
+
+const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
+  )
+}
 
 export default App

@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.noder.restapi.dtos.UpdateEmailDTO;
+import com.noder.restapi.dtos.UpdatePinDTO;
 import com.noder.restapi.dtos.UserCreationDTO;
 import com.noder.restapi.dtos.UserDTO;
 import com.noder.restapi.models.UserEntity;
@@ -99,5 +101,39 @@ public class UserService {
         }
         return userRepository.findByEmail(currentUserName);
         
+    }
+
+    public boolean updateUserEmail(UpdateEmailDTO dto) {
+        Optional<UserEntity> userOpt = getUserFromAuthentication();
+        if (userOpt.isEmpty()) return false;
+
+        UserEntity user = userOpt.get();
+
+        if (!isPinValid(dto.getCurrentPin(), user.getPin())) {
+            return false;
+        }
+
+        if (existsByEmail(dto.getNewEmail())) {
+            throw new IllegalArgumentException("Email ya está en uso.");
+        }
+
+        user.setEmail(dto.getNewEmail());
+        userRepository.save(user);
+        return true;
+    }
+
+    public boolean updateUserPin(UpdatePinDTO dto) {
+        Optional<UserEntity> userOpt = getUserFromAuthentication();
+        if (userOpt.isEmpty()) return false;
+
+        UserEntity user = userOpt.get();
+
+        if (!isPinValid(dto.getCurrentPin(), user.getPin())) {
+            return false;
+        }
+
+        user.setPin(hashPin(dto.getNewPin()));
+        userRepository.save(user);
+        return true;
     }
 }

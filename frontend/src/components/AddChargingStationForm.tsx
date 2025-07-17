@@ -9,7 +9,12 @@ type Props = {
 };
 
 const AddChargingStationForm = ({ onChargingStationAdded, setErrorMessage, setTypeErrorMessage}: Props) => {
-  const [form, setForm] = useState<ChargingStationCreate>({ name: ''});
+  const [form, setForm] = useState<ChargingStationCreate>({
+    name: '',
+    location: '',
+    photoUrl: '',
+    info: ''
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -27,7 +32,7 @@ const AddChargingStationForm = ({ onChargingStationAdded, setErrorMessage, setTy
 
     try {
       const newStation = await stationService.registerStation(form);
-      setForm({ name: ''});
+      setForm({ name: '', location: '', photoUrl: '', info: '' });
       setErrorMessage('Estación agregada correctamente');
       setTypeErrorMessage('success');
       setTimeout(() => {
@@ -78,14 +83,14 @@ const AddChargingStationForm = ({ onChargingStationAdded, setErrorMessage, setTy
       </div>
 
       <div>
-        <label htmlFor="photoURL" className="block text-sm text-gray-700 mb-1 font-medium">
+        <label htmlFor="photoUrl" className="block text-sm text-gray-700 mb-1 font-medium">
           URL de la foto
         </label>
         <input
           type="text"
-          name="photoURL"
-          id="photoURL"
-          value={form.photoURL || ''}
+          name="photoUrl"
+          id="photoUrl"
+          value={form.photoUrl || ''}
           onChange={handleChange}
           className="w-full px-3 py-2 rounded-md border border-stone-300 bg-zinc-50 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-700"
         />

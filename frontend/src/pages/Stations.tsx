@@ -1,23 +1,33 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { useAuth } from "../context/AuthContext";
 import AddChargingStationForm from "../components/AddChargingStationForm";
 import type { ChargingStation } from '../interfaces/ChargingStation';
 import stationService from '../services/chargingStationService';
 
 const Stations = () => {
   const [stations, setStations] = useState<ChargingStation[]>([]);
+  const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [typeErrorMessage, setTypeErrorMessage] = useState<'success' | 'error' | null>(null);
   const [showForm, setShowForm] = useState(false);
 
+  const { user, isAuthenticated } = useAuth();
+
   useEffect(() => {
     const getStations = async () => {
+      if (!isAuthenticated) return;
+
       try {
+        setLoading(true);
         const stations = await stationService.getUserStations()
         setStations(stations);
+        setErrorMessage(null);
       } catch (err) {
         console.error(err);
         setErrorMessage('Error al cargar estaciones.');
+      } finally {
+        setLoading(false);
       }
     }
     getStations();
@@ -42,6 +52,14 @@ const Stations = () => {
         setTypeErrorMessage(null);
       }, 5000);
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-lg text-gray-600">Cargando estaciones...</div>
+      </div>
+    );
   }
   
   return (
@@ -89,9 +107,9 @@ const Stations = () => {
                 key={station.id}
                 className="bg-gray-50 p-4 rounded shadow border border-gray-200 flex flex-col items-center cursor-pointer"
               >
-                {station.photoURL ? (
+                {station.photoUrl ? (
                   <img
-                    src={station.photoURL}
+                    src={station.photoUrl}
                     alt={`Estación ${station.name}`}
                     className="w-24 h-24 object-cover rounded-full mb-3"
                   />

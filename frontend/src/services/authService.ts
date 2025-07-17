@@ -3,13 +3,25 @@ import axios from 'axios'
 const baseUrl = '/api/v1/auth'
 
 interface LoginCredentials {
-  email: string
-  pin: string
-}
+  email: string,
+  pin: string,
+};
 
-const login = async (credentials: LoginCredentials) => {
-  const response = await axios.post(`${baseUrl}/login`, credentials)
-  return response.data
+interface LoginResponse {
+  token: string,
+  tokenType: string,
+};
+
+const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {
+  try {
+    const response = await axios.post<LoginResponse>(`${baseUrl}/login`, credentials)
+    return response.data
+  } catch (error: any) {
+    if (error.response?.data) {
+      throw new Error(error.response.data.error || 'Error logging in');
+    }
+    throw new Error('Connection problem');
+  }
 }
 
 // async function login2(username, password) {
