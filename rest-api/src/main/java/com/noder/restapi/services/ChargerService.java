@@ -2,10 +2,12 @@ package com.noder.restapi.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import com.noder.restapi.dtos.ChargingStationCreateDTO;
+import com.noder.restapi.dtos.ChargingStationResponseDTO;
 import com.noder.restapi.models.Charger;
 import com.noder.restapi.models.ChargingStation;
 import com.noder.restapi.models.UserEntity;
@@ -44,11 +46,18 @@ public class ChargerService {
         return chargerRepository.existsById(chargerId);
     }
 
-    public List<ChargingStation> getStationsFromUser(Long userId) {
-        return chargingStationRepository.findByAdministratorId(userId);
+    public List<ChargingStationResponseDTO> getStationsFromUser(Long userId) {
+        return chargingStationRepository.findByAdministratorId(userId).stream()
+            .map(station -> new ChargingStationResponseDTO(
+                station.getId(),
+                station.getLocation(),
+                station.getName(),
+                station.getPhotoUrl(),
+                station.getInfo()))
+            .toList();
     }
-    
-    public ChargingStation saveStationFromDTO(ChargingStationCreateDTO chargingStationDTO, Long userId){
+
+    public ChargingStationResponseDTO saveStationFromDTO(ChargingStationCreateDTO chargingStationDTO, Long userId){
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         ChargingStation chargingStation = new ChargingStation();
         chargingStation.setName(chargingStationDTO.getName());
@@ -58,7 +67,11 @@ public class ChargerService {
 
         chargingStation.setAdministrators(List.of(user));
         // chargingStation.(List.of(user));
-        return chargingStationRepository.save(chargingStation);
+        System.out.println("Saving charging station: " + chargingStation);
+        chargingStationRepository.save(chargingStation);
+        System.out.println("Saved charging station: " + chargingStation);
+        ChargingStationResponseDTO responseDTO = new ChargingStationResponseDTO(chargingStation.getId(), chargingStation.getLocation(), chargingStation.getName(), chargingStation.getPhotoUrl(), chargingStation.getInfo());
+        return responseDTO;
     }
 
     public boolean allowConnection(Long chargerId) {
@@ -67,5 +80,19 @@ public class ChargerService {
         } else {
             return false;
         }
+    }
+
+    public String registerCharger(String chargerName, Long id) {
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        Charger charger = new Charger();
+        charger.setName(chargerName);
+        String chargerKey;
+        do {
+            // Shorter UUID because user have to put this on his charger so is more convenient.
+            chargerKey = UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase();
+        } while (chargerRepository.existsByKey(chargerKey));
+        charger.setKey(chargerKey);
+        chargerRepository.save(charger);
+        return charger.getKey();
     }
 }

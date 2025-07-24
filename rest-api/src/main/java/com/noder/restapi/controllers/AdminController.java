@@ -6,10 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.noder.restapi.dtos.ChargingStationCreateDTO;
+import com.noder.restapi.dtos.ChargingStationResponseDTO;
 import com.noder.restapi.models.Charger;
 import com.noder.restapi.models.ChargingStation;
 import com.noder.restapi.models.Transaction;
@@ -18,7 +20,6 @@ import com.noder.restapi.services.ChargerService;
 import com.noder.restapi.services.TransactionService;
 import com.noder.restapi.services.UserService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 
 
@@ -45,11 +46,11 @@ public class AdminController {
 
     // Register a new charger
     @PostMapping("/chargers")
-    public ResponseEntity<Charger> registerCharger(Charger charger) {
-        // TODO: Set id
-        UserEntity user = userService.getUserFromAuthentication().orElse(null);
-        if (user == null) return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(chargerService.saveCharger(charger).get());
+    public ResponseEntity<String> registerCharger(String chargerName) {
+        Long userId = userService.getUserIdFromAuthentication().orElse(null);
+        if (userId == null) return ResponseEntity.badRequest().build();
+        String chargerKey = chargerService.registerCharger(chargerName, userId);
+        return ResponseEntity.ok(chargerKey);
     }
 
     // Get information about specific charger
@@ -75,7 +76,7 @@ public class AdminController {
 
     // List of all stations for a specific admin
     @GetMapping("/stations")
-    public ResponseEntity<List<ChargingStation>> getStations() {
+    public ResponseEntity<List<ChargingStationResponseDTO>> getStations() {
         Long userId = userService.getUserIdFromAuthentication().orElse(null);
         if (userId == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(chargerService.getStationsFromUser(userId));
@@ -83,10 +84,12 @@ public class AdminController {
 
     // TODO: Use stations DTO (if needed)
     @PostMapping("/stations")
-    public ResponseEntity<ChargingStation> postMethodName(@Valid @RequestBody ChargingStationCreateDTO chargingStation) {
+    public ResponseEntity<ChargingStationResponseDTO> postMethodName(@Valid @RequestBody ChargingStationCreateDTO chargingStation) {
         Long userId = userService.getUserIdFromAuthentication().orElse(null);
         if (userId == null) return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(chargerService.saveStationFromDTO(chargingStation, userId));
+        ChargingStationResponseDTO station = chargerService.saveStationFromDTO(chargingStation, userId);
+        if (station == null) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(station);
     }
         
 }

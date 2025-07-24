@@ -27,12 +27,15 @@ public class Charger {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
+    private String name;
+    @NotNull
     private String location;
     @NotNull
     private Integer connector_count;
     @NotNull
     private String uri;
     @NotNull
+    @Column(unique = true)
     private String key;
     @NotNull
     private ChargerStatus status;
@@ -67,6 +70,14 @@ public class Charger {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getLocation() {

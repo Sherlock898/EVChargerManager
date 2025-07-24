@@ -103,9 +103,7 @@ const getUserStations = async () => {
 
 const registerStation = async (station: ChargingStationCreate) => {
   try {
-    console.log(station);
-    const lol = {name: 'Xd', location: 'lol', photoUrl: 'xd.com', info: 'ay'};
-    const response = await api.post('/admin/stations', lol);
+    const response = await api.post('/admin/stations', station);
     return response.data;
   } catch (error) {
     console.log("Error registering station", error);
