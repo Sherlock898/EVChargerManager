@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api/apiClient';
 
 type UserData = {
   firstName: string;
@@ -17,7 +17,7 @@ type Props = {
 
 const Settings = ({ user, onLogout, theme, onThemeChange }: Props) => {
   const [userData, setUserData] = useState<UserData | null>(null);
-
+  const [error, setError] = useState<string | null>(null);
   // Estados para cambiar email
   const [newEmail, setNewEmail] = useState('');
   const [currentPinForEmail, setCurrentPinForEmail] = useState('');
@@ -32,15 +32,20 @@ const Settings = ({ user, onLogout, theme, onThemeChange }: Props) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get('/api/v1/users/me', {
-          headers: {
-            Authorization: `${user.tokenType} ${user.token}`,
-          },
-        });
+        const response = await api.get('/users/me');
         setUserData(response.data);
         setNewEmail(response.data.email);
-      } catch (error) {
-        console.error('Error al cargar datos de usuario', error);
+      } catch (err: any) {
+        console.error('Error al cargar datos de usuario', err);
+        if (err.response) {
+          console.error('Status:', err.response.status);
+          console.error('Data:', err.response.data);
+        } else if (err.request) {
+          console.error('No se recibió respuesta del servidor');
+        } else {
+          console.error('Error desconocido:', err.message);
+        }
+        setError('No se pudo cargar el usuario');
       }
     };
     fetchUser();
@@ -51,13 +56,10 @@ const Settings = ({ user, onLogout, theme, onThemeChange }: Props) => {
     e.preventDefault();
     setEmailMessage(null);
     try {
-      await axios.put(
-        '/api/v1/users/email',
-        { newEmail, currentPin: currentPinForEmail },
-        {
-          headers: { Authorization: `${user.tokenType} ${user.token}` },
-        }
-      );
+      await api.put('/users/email', {
+        newEmail,
+        currentPin: currentPinForEmail,
+      });
       setEmailMessage({ text: 'Correo actualizado correctamente', type: 'success' });
       setCurrentPinForEmail('');
     } catch (err: any) {
@@ -71,13 +73,10 @@ const Settings = ({ user, onLogout, theme, onThemeChange }: Props) => {
     e.preventDefault();
     setPinMessage(null);
     try {
-      await axios.put(
-        '/api/v1/users/pin',
-        { currentPin, newPin },
-        {
-          headers: { Authorization: `${user.tokenType} ${user.token}` },
-        }
-      );
+      await api.put('/users/pin', {
+        currentPin,
+        newPin,
+      });
       setPinMessage({ text: 'PIN actualizado correctamente', type: 'success' });
       setCurrentPin('');
       setNewPin('');
