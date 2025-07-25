@@ -3,11 +3,12 @@ import type { WebSocketServerInfo } from "./WebSocketServerInfo"
 
 export interface Charger {
   id: number,
+  name: string,
   location: string,
   connector_count: number,
   uri: string,
   key: string,
-  chargerStatus: string
+  status: string
   connectors: Connector[],
   chargingStation: ChargingStation,
   webSocketServer: WebSocketServerInfo

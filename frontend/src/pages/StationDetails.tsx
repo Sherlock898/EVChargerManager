@@ -1,24 +1,43 @@
 import { useLocation, useParams } from "react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ChargingStation } from "../interfaces/ChargingStation";
 import AddChargerForm from "../components/AddChargerForm";
 import chargerService from '../services/chargerService';
+import type { Charger } from "../interfaces/Charger";
 
 const StationDetails = () => {
   const [showChargerForm, setShowChargerForm] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [typeErrorMessage, setTypeErrorMessage] = useState<'success' | 'error' | null>(null);
-  const location = useLocation()
-  const station = (location.state as { station: ChargingStation })?.station
-  const [chargers, setChargers] = useState(station?.chargers || []);
-  const { stationId } = useParams<{ stationId: string }>();
   
-  const handleChargerAdded = async () => {
+  const location = useLocation()
+  const { stationId } = useParams<{ stationId: string }>();
+
+  const [station, setStation] = useState<ChargingStation | null>((location.state as { station: ChargingStation })?.station || null);
+  const [chargers, setChargers] = useState<Charger[]>([]);
+  
+  useEffect(() => {
+    const loadStationDetails = async () => {
+      if (!stationId) return;
+
+      // TODO: Implementar servicio para cargar estación por ID
+      try {
+        const chargers = await chargerService.getChargersByStationId(stationId);
+        setChargers(chargers);
+      } catch (err) {
+        console.error(err);
+        setErrorMessage("Error al cargar la estación.");
+      }
+    }
+    loadStationDetails();
+  }, [])
+
+  const handleChargerAdded = async (name: string) => {
     if (!stationId) return;
 
     try {
-      const updatedChargers = await chargerService.getChargersByStationId(stationId);
-      setChargers(updatedChargers);
+      const newCharger = await chargerService.registerCharger({ name: name, stationId: stationId });
+      setChargers([...chargers, newCharger]);
       setErrorMessage("Cargador agregado exitosamente.");
       setTypeErrorMessage("success");
       setShowChargerForm(false);
@@ -37,6 +56,23 @@ const StationDetails = () => {
       }, 5000);
     }
   };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "WAITING_FOR_SETUP":
+        return "bg-gray-400";
+      case "NOT_CONNECTED":
+        return "bg-gray-300";
+      case "AVAILABLE":
+        return "bg-green-500";
+      case "UNAVAILABLE":
+        return "bg-yellow-500";
+      case "FAULTED":
+        return "bg-red-500";
+      default:
+        return "bg-gray-400";
+    }
+  }
   
   if (!station) return <p>No se pudo cargar información de la estación</p>
 
@@ -76,9 +112,10 @@ const StationDetails = () => {
             <ul className="space-y-4">
               {chargers.map((charger, index) => (
                 <li key={index} className="flex items-center gap-2">
-                  <span className="font-medium">• Nombre cargador {index + 1}</span>
-                  <span className="w-4 h-4 bg-blue-200 rounded-full"></span>
-                  {charger.chargerStatus && <span className="text-gray-600">({charger.chargerStatus})</span>}
+                  <span className="font-medium">• {charger.name}</span>
+                  <span className={`w-4 h-4 rounded-full ${getStatusColor(charger.status)}`}></span>
+                  {charger.status && <span className="text-gray-600">({charger.status})</span>}
+                  {charger.key && <span className="text-gray-500 text-xs">Key: {charger.key}</span>}
                 </li>
               ))}
             </ul>

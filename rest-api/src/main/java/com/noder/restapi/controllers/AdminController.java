@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.noder.restapi.dtos.ChargerRegisterCreateDTO;
+import com.noder.restapi.dtos.ChargerResponseDTO;
 import com.noder.restapi.dtos.ChargingStationCreateDTO;
 import com.noder.restapi.dtos.ChargingStationResponseDTO;
 import com.noder.restapi.models.Charger;
@@ -46,11 +48,11 @@ public class AdminController {
 
     // Register a new charger
     @PostMapping("/chargers")
-    public ResponseEntity<String> registerCharger(String chargerName) {
+    public ResponseEntity<ChargerResponseDTO> registerCharger(@RequestBody ChargerRegisterCreateDTO chargerCreateDTO) {
         Long userId = userService.getUserIdFromAuthentication().orElse(null);
         if (userId == null) return ResponseEntity.badRequest().build();
-        String chargerKey = chargerService.registerCharger(chargerName, userId);
-        return ResponseEntity.ok(chargerKey);
+        ChargerResponseDTO chargerResponse = chargerService.registerCharger(chargerCreateDTO, userId);
+        return ResponseEntity.ok(chargerResponse);
     }
 
     // Get information about specific charger
@@ -91,5 +93,10 @@ public class AdminController {
         if (station == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(station);
     }
-        
+
+    @GetMapping("/stations/{stationId}/chargers")
+    public ResponseEntity<List<ChargerResponseDTO>> getChargersByStationId(@PathVariable Long stationId) {
+        List<ChargerResponseDTO> chargers = chargerService.getChargersByStationId(stationId);
+        return ResponseEntity.ok(chargers);
+    }
 }

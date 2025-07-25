@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router';
+import { useAuth } from '../context/AuthContext';
 
 interface NavItem {
   name: string;
@@ -78,6 +79,7 @@ const UserPanel = ({ user, className }: UserPanelProps) => {
 
 const Sidebar = ({ isExpanded = true, onToggle }: SidebarProps) => {
   const location = useLocation();
+  const { logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [internalExpanded, setInternalExpanded] = useState(isExpanded);
   
@@ -168,7 +170,7 @@ const Sidebar = ({ isExpanded = true, onToggle }: SidebarProps) => {
             <div className="w-5 h-5 flex items-center justify-center">
               <div className="w-4 h-4 rounded-full border border-gray-300"></div>
             </div>
-            {internalExpanded && <span>Cerrar sesión</span>}
+            {internalExpanded && <span onClick={logout}>Cerrar sesión</span>}
           </button>
         </div>
       </aside>
