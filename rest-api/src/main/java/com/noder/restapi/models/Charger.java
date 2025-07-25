@@ -18,6 +18,8 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 public class Charger {
     public enum ChargerStatus {
+        WAITING_FOR_SETUP,
+        NOT_CONNECTED,
         AVAILABLE,
         UNAVAILABLE,
         FAULTED
@@ -28,8 +30,6 @@ public class Charger {
     private Long id;
     @NotNull
     private String name;
-    @NotNull
-    private String location;
     @NotNull
     private Integer connector_count;
     @NotNull
@@ -48,7 +48,7 @@ public class Charger {
     private ChargingStation chargingStation;
 
     @ManyToOne
-    @JoinColumn(name = "web_socket_server_id", nullable = false)
+    @JoinColumn(name = "web_socket_server_id", nullable = true)
     private WebSocketServer webSocketServer;
 
     @Column(updatable = false)
@@ -78,14 +78,6 @@ public class Charger {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public Integer getConnector_count() {
@@ -134,6 +126,14 @@ public class Charger {
 
     public void setWebSocketServer(WebSocketServer webSocketServer) {
         this.webSocketServer = webSocketServer;
+    }
+
+    public ChargingStation getChargingStation() {
+        return chargingStation;
+    }
+
+    public void setChargingStation(ChargingStation chargingStation) {
+        this.chargingStation = chargingStation;
     }
 
     public Instant getCreated_at() {

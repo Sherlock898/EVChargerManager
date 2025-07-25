@@ -4,7 +4,7 @@ import chargerService from '../services/chargerService'; // Crea este servicio s
 
 type Props = {
   stationId: string;
-  onChargerAdded: () => void;
+  onChargerAdded: (name: string) => void;
   setErrorMessage: (msg: string | null) => void;
   setTypeErrorMessage: (type: 'success' | 'error' | null) => void;
 };
@@ -27,7 +27,6 @@ const AddChargerForm = ({ stationId, onChargerAdded, setErrorMessage, setTypeErr
     }
 
     try {
-      await chargerService.registerCharger(stationId, form);
       setForm({ name: '' });
       setErrorMessage('Cargador agregado correctamente');
       setTypeErrorMessage('success');
@@ -35,7 +34,7 @@ const AddChargerForm = ({ stationId, onChargerAdded, setErrorMessage, setTypeErr
         setErrorMessage(null);
         setTypeErrorMessage(null);
       }, 5000);
-      onChargerAdded();
+      await onChargerAdded(form.name);
     } catch (err) {
       setErrorMessage('Error al agregar el cargador');
       setTypeErrorMessage('error');

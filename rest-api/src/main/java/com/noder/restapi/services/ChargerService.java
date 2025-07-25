@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.noder.restapi.dtos.ChargerRegisterCreateDTO;
+import com.noder.restapi.dtos.ChargerResponseDTO;
 import com.noder.restapi.dtos.ChargingStationCreateDTO;
 import com.noder.restapi.dtos.ChargingStationResponseDTO;
 import com.noder.restapi.models.Charger;
@@ -82,10 +84,17 @@ public class ChargerService {
         }
     }
 
-    public String registerCharger(String chargerName, Long id) {
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    public ChargerResponseDTO registerCharger(ChargerRegisterCreateDTO chargerCreateDTO, Long userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        ChargingStation chargingStation = chargingStationRepository.findById(chargerCreateDTO.getStationId())
+            .orElseThrow(() -> new RuntimeException("Charging station not found"));
         Charger charger = new Charger();
-        charger.setName(chargerName);
+        charger.setName(chargerCreateDTO.getName());
+        charger.setConector_count(-1); // -1 means unknown
+        charger.setUri("URL_TO_BE_SET"); // Placeholder, should be set later
+        charger.setStatus(Charger.ChargerStatus.WAITING_FOR_SETUP);
+        charger.setWebSocketServer(null); // Placeholder, should be set later
+        charger.setChargingStation(chargingStation);
         String chargerKey;
         do {
             // Shorter UUID because user have to put this on his charger so is more convenient.
@@ -93,6 +102,35 @@ public class ChargerService {
         } while (chargerRepository.existsByKey(chargerKey));
         charger.setKey(chargerKey);
         chargerRepository.save(charger);
-        return charger.getKey();
+
+        ChargerResponseDTO responseDTO = new ChargerResponseDTO();
+        responseDTO.setId(charger.getId());
+        responseDTO.setName(charger.getName());
+        responseDTO.setLocation(chargingStation.getLocation());
+        responseDTO.setStatus(charger.getStatus().name());
+        responseDTO.setConnectorCount(charger.getConnector_count());
+        responseDTO.setUri(charger.getUri());
+        responseDTO.setKey(charger.getKey());
+        System.out.println("Registered charger: " + responseDTO);
+        return responseDTO;
+    }
+
+    public List<ChargerResponseDTO> getChargersByStationId(Long stationId) {
+        ChargingStation chargingStation = chargingStationRepository.findById(stationId)
+            .orElseThrow(() -> new RuntimeException("Charging station not found"));
+        
+        return chargerRepository.findByChargingStationId(stationId).stream()
+            .map(charger -> {
+                ChargerResponseDTO dto = new ChargerResponseDTO();
+                dto.setId(charger.getId());
+                dto.setName(charger.getName());
+                dto.setLocation(chargingStation.getLocation());
+                dto.setStatus(charger.getStatus().name());
+                dto.setConnectorCount(charger.getConnector_count());
+                dto.setUri(charger.getUri());
+                dto.setKey(charger.getKey());
+                return dto;
+            })
+            .toList();
     }
 }
